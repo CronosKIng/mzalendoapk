@@ -18,11 +18,24 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
     
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v4
-    
-    - name: Build APK
+    - name: Build with Gradle
       run: |
+        # Install Android SDK manually
+        export ANDROID_HOME=$HOME/android-sdk
+        mkdir -p $ANDROID_HOME
+        wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+        unzip commandlinetools-linux-11076708_latest.zip -d $ANDROID_HOME
+        mv $ANDROID_HOME/cmdline-tools $ANDROID_HOME/latest
+        mkdir -p $ANDROID_HOME/cmdline-tools
+        mv $ANDROID_HOME/latest $ANDROID_HOME/cmdline-tools/
+        
+        # Accept licenses
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
+        
+        # Install build tools
+        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-29" "build-tools;29.0.3"
+        
+        # Build
         chmod +x gradlew
         ./gradlew assembleRelease --no-daemon
       env:
