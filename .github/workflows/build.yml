@@ -18,6 +18,11 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
     
+    - name: Install Gradle
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gradle
+    
     - name: Build APK
       run: |
         export ANDROID_HOME=$HOME/android-sdk
@@ -27,12 +32,14 @@ jobs:
         mv $ANDROID_HOME/cmdline-tools $ANDROID_HOME/latest
         mkdir -p $ANDROID_HOME/cmdline-tools
         mv $ANDROID_HOME/latest $ANDROID_HOME/cmdline-tools/
-        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1
-        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-29" "build-tools;29.0.3" > /dev/null 2>&1
-        chmod +x gradlew
-        ./gradlew assembleRelease --no-daemon
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1 || true
+        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-29" "build-tools;29.0.3" > /dev/null 2>&1 || true
+        
+        # Build using system gradle
+        gradle assembleRelease --no-daemon
       env:
         ANDROID_HOME: $HOME/android-sdk
+        JAVA_OPTS: "-Xmx1024m"
     
     - name: Upload APK
       uses: actions/upload-artifact@v4
