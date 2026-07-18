@@ -21,15 +21,19 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
     
-    - name: Grant execute permission
-      run: chmod +x gradlew
-    
     - name: Build APK
-      run: ./gradlew assembleRelease --no-daemon
+      run: |
+        # Install gradle
+        sudo apt-get update
+        sudo apt-get install -y gradle
+        
+        # Build
+        gradle assembleRelease --no-daemon
+      env:
+        JAVA_OPTS: -Xmx1024m
     
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: MzalendoApp
         path: app/build/outputs/apk/release/*.apk
-        retention-days: 30
