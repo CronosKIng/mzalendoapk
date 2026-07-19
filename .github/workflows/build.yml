@@ -5,7 +5,6 @@ on:
     branches:
       - master
       - main
-
   workflow_dispatch:
 
 jobs:
@@ -25,16 +24,15 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Accept Licenses
-        run: yes | sdkmanager --licenses
+        run: yes | sdkmanager --licenses || true
 
-      - name: Make gradlew executable
-        run: chmod +x gradlew
-
-      - name: Build Release APK
-        run: ./gradlew assembleRelease --no-daemon
+      - name: Build Debug APK
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: release-apk
-          path: app/build/outputs/apk/release/*.apk
+          name: MzalendoApp-Debug
+          path: app/build/outputs/apk/debug/*.apk
