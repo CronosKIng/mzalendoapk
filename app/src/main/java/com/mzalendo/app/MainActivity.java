@@ -32,8 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private WebView webView;
     private ProgressBar progressBar;
     private static final int REQUEST_CAMERA_PERMISSION = 100;
-    private static final int REQUEST_STORAGE_PERMISSION = 101;
-    private String currentUrl = "https://ubunifu.faithfultour.com/";
+    private String currentUrl = "https://GhostTester.pythonanywhere.com/parent/login";
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -61,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
         webSettings.setSupportZoom(true);
 
-        // Enable mixed content for HTTP
+        // Enable mixed content
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         }
@@ -87,18 +86,16 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                // Handle external links
-                if (url.startsWith("tel:") || url.startsWith("mailto:")) {
+                if (url.startsWith("tel:") || url.startsWith("mailto:") || url.startsWith("whatsapp:")) {
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                     startActivity(intent);
                     return true;
                 }
-                // Allow all other links in WebView
                 return false;
             }
         });
 
-        // WebChromeClient for camera and file upload
+        // WebChromeClient
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onPermissionRequest(final android.webkit.PermissionRequest request) {
@@ -108,10 +105,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Add JavaScript interface for Android
+        // JavaScript interface
         webView.addJavascriptInterface(new WebAppInterface(), "Android");
 
-        // Load the URL
+        // Load URL
         webView.loadUrl(currentUrl);
     }
 
@@ -150,13 +147,12 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
             for (int i = 0; i < permissions.length; i++) {
                 if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, "Tafadhali ruhusu camera na storage", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Please allow camera and storage permissions", Toast.LENGTH_LONG).show();
                 }
             }
         }
     }
 
-    // JavaScript interface for communication between WebView and Android
     public class WebAppInterface {
         @JavascriptInterface
         public void showToast(String message) {
