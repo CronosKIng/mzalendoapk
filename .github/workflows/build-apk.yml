@@ -2,42 +2,34 @@ name: Build APK
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    
     steps:
     - uses: actions/checkout@v4
-
-    # 1. Tumia JDK 11 (Inaoana na Gradle 7.4.2)
-    - name: Set up JDK 11
+    
+    - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
-        java-version: '11'
+        java-version: '17'
         distribution: 'temurin'
-
-    # 2. Kubali leseni kabla ya ujenzi
-    - name: Accept Licenses
-      run: |
-        mkdir -p $ANDROID_HOME/licenses
-        echo "8933bad161af4178b1185d1a37fbf41ea5261c55" > $ANDROID_HOME/licenses/android-sdk-license
-        echo "d56f51874783516562093465805b7c72f7e75850" > $ANDROID_HOME/licenses/android-sdk-preview-license
-
-    # 3. Kutoa ruhusa ya ujenzi
-    - name: Grant execute permission for gradlew
+    
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+    
+    - name: Grant execute permission
       run: chmod +x gradlew
-
-    # 4. Build APK (Kwa kutumia Wrapper iliyopo kwenye project yako)
+    
     - name: Build APK
       run: ./gradlew assembleDebug --no-daemon
-
-    # 5. Upload APK
+    
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: MzalendoApp
+        name: GhostTester-App
         path: app/build/outputs/apk/debug/*.apk
         retention-days: 30
